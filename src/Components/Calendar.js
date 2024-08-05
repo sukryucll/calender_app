@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from "react";
 import "./Calendar.css";
+import { getStoredDate, getStoredMonth, setStoredDate, setStoredMonth } from './storage';
 
 function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [daysInMonth, setDaysInMonth] = useState([]);
   const [startDay, setStartDay] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
+
+  useEffect(() => {
+    const storedDate = getStoredDate();
+    const storedMonth = getStoredMonth();
+
+    if (!storedDate) {
+      // If there's no stored date, set today's date as the selected date
+      setSelectedDate(new Date());
+    } else {
+      setSelectedDate(storedDate);
+    }
+
+    setCurrentDate(storedMonth);
+  }, []);
 
   useEffect(() => {
     const year = currentDate.getFullYear();
@@ -22,11 +37,20 @@ function Calendar() {
     setStartDay(new Date(year, month, 1).getDay());
   }, [currentDate]);
 
+  useEffect(() => {
+    setStoredDate(selectedDate);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    setStoredMonth(currentDate);
+  }, [currentDate]);
+
   const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
   const prevMonth = () => {
     setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)));
   };
+
   const nextMonth = () => {
     setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)));
   };
@@ -40,8 +64,7 @@ function Calendar() {
       <div className="header">
         <button onClick={prevMonth}>&lt;</button>
         <span>
-          {currentDate.toLocaleString("default", { month: "long" })}
-          {currentDate.getFullYear()}
+          {currentDate.toLocaleString("en-US", { month: "long" })} {currentDate.getFullYear()}
         </span>
         <button onClick={nextMonth}>&gt;</button>
       </div>
@@ -58,13 +81,8 @@ function Calendar() {
         ))}
         {daysInMonth.map((day) => (
           <div
-            key={day}
+            key={day.toDateString()}
             className={`day ${
-              day.getDate() === new Date().getDate() &&
-              day.getMonth() === new Date().getMonth()
-                ? "today"
-                : ""
-            } ${
               selectedDate && day.toDateString() === selectedDate.toDateString()
                 ? "selected"
                 : ""
