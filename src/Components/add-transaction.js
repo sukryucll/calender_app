@@ -28,14 +28,14 @@ export default function TransactionForm({ onClose, isOpen, onAddTransaction }) {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Add New Transaction</ModalHeader>
+        <ModalHeader>Add New Todo</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <FormControl mb={4}>
-            <FormLabel htmlFor="description">Description</FormLabel>
+            <FormLabel htmlFor="description">Todo</FormLabel>
             <Input
               id="description"
-              placeholder="Enter description"
+              placeholder="Enter todo"
               name="description"
               type="text"
               value={description}

@@ -2,7 +2,14 @@ import { Box, Flex, Heading, Text, IconButton } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 import React from "react";
 
-function Todos({ transactions, onRemoveTransaction }) {
+function Todos({ transactions, onRemoveTransaction, selectedDate }) {
+  // Tarihi formatlamak için bir fonksiyon
+  const formatDate = (date) => {
+    if (!date) return '';
+    const options = { day: '2-digit', month: 'short', year: 'numeric' };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  };
+
   return (
     <Box
       p="6"
@@ -15,10 +22,16 @@ function Todos({ transactions, onRemoveTransaction }) {
       flexDirection="column"
       alignItems="center"
       width="300px"
+      data-aos="fade-right"
     >
       <Heading size="md" mb="4" color="white">
         Todos
       </Heading>
+      {selectedDate && (
+        <Text color="white" mb="4">
+          {formatDate(selectedDate)}
+        </Text>
+      )}
       {transactions.length === 0 ? (
         <Text color="white">No todos available.</Text>
       ) : (

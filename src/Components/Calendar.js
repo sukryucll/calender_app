@@ -122,23 +122,26 @@ function Calendar() {
           ))}
           {daysInMonth.map((day) => (
             <div
-              key={day.toDateString()}
-              className={`day ${
-                selectedDate &&
-                day.toDateString() === selectedDate.toDateString()
-                  ? "selected"
-                  : ""
-              }`}
-              onClick={() => handleDateClick(day)}
-            >
-              <span>{day.getDate()}</span>
-              <div
-                className="square"
-                onClick={(e) => handleSquareClick(e, day)}
-              >
-                <AddIcon />
-              </div>
-            </div>
+  key={day.toDateString()}
+  className={`day ${selectedDate && day.toDateString() === selectedDate.toDateString() ? "selected" : ""}`}
+  onClick={() => handleDateClick(day)}
+>
+  <span>{day.getDate()}</span>
+  <div className="square-container">
+    <div
+      className="square"
+      onClick={(e) => handleSquareClick(e, day)}
+    >
+      <AddIcon />
+    </div>
+    {todosByDate[day.toDateString()] && todosByDate[day.toDateString()].length > 0 && (
+      <div className="square-count">
+        {todosByDate[day.toDateString()].length}
+      </div>
+    )}
+  </div>
+</div>
+
           ))}
         </div>
         <TransactionForm
@@ -147,7 +150,11 @@ function Calendar() {
           onAddTransaction={handleAddTransaction}
         />
       </div>
-      <Todos transactions={todosByDate[selectedDate?.toDateString()] || []} onRemoveTransaction={handleRemoveTransaction} />
+      <Todos
+  transactions={todosByDate[selectedDate?.toDateString()] || []}
+  onRemoveTransaction={handleRemoveTransaction}
+  selectedDate={selectedDate}
+/>
     </div>
   );
 }
