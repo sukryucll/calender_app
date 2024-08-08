@@ -11,6 +11,7 @@ import {
 import TransactionForm from "./add-transaction";
 import { useDisclosure } from "@chakra-ui/react";
 import Todos from "./todos";
+import { AddIcon } from "@chakra-ui/icons"; // Artı işareti için
 
 function Calendar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -18,7 +19,7 @@ function Calendar() {
   const [daysInMonth, setDaysInMonth] = useState([]);
   const [startDay, setStartDay] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [transactions, setTransactions] = useState([]);
+  const [todosByDate, setTodosByDate] = useState({}); // Tarih bazında todo'ları saklamak için
 
   useEffect(() => {
     const storedDate = getStoredDate();
@@ -32,7 +33,7 @@ function Calendar() {
     }
 
     setCurrentDate(storedMonth);
-    setTransactions(storedTodos);
+    setTodosByDate(storedTodos);
   }, []);
 
   useEffect(() => {
@@ -59,8 +60,8 @@ function Calendar() {
   }, [currentDate]);
 
   useEffect(() => {
-    setStoredTodos(transactions);
-  }, [transactions]);
+    setStoredTodos(todosByDate);
+  }, [todosByDate]);
 
   const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
@@ -74,11 +75,27 @@ function Calendar() {
 
   const handleDateClick = (date) => {
     setSelectedDate(date);
-    onOpen();
+  };
+
+  const handleSquareClick = (e, date) => {
+    e.stopPropagation(); // Kareye tıklama olayının tarihe yayılmasını engeller
+    setSelectedDate(date);
+    onOpen(); // Formu açar
   };
 
   const handleAddTransaction = (description) => {
-    setTransactions([...transactions, description]);
+    setTodosByDate((prev) => ({
+      ...prev,
+      [selectedDate.toDateString()]: [...(prev[selectedDate.toDateString()] || []), description],
+    }));
+  };
+
+  const handleRemoveTransaction = (index) => {
+    const updatedTodos = todosByDate[selectedDate.toDateString()].filter((_, i) => i !== index);
+    setTodosByDate((prev) => ({
+      ...prev,
+      [selectedDate.toDateString()]: updatedTodos,
+    }));
   };
 
   return (
@@ -104,7 +121,7 @@ function Calendar() {
             <div key={index} className="empty-day"></div>
           ))}
           {daysInMonth.map((day) => (
-            <button
+            <div
               key={day.toDateString()}
               className={`day ${
                 selectedDate &&
@@ -114,8 +131,14 @@ function Calendar() {
               }`}
               onClick={() => handleDateClick(day)}
             >
-              {day.getDate()}
-            </button>
+              <span>{day.getDate()}</span>
+              <div
+                className="square"
+                onClick={(e) => handleSquareClick(e, day)}
+              >
+                <AddIcon />
+              </div>
+            </div>
           ))}
         </div>
         <TransactionForm
@@ -124,7 +147,7 @@ function Calendar() {
           onAddTransaction={handleAddTransaction}
         />
       </div>
-      <Todos transactions={transactions} />
+      <Todos transactions={todosByDate[selectedDate?.toDateString()] || []} onRemoveTransaction={handleRemoveTransaction} />
     </div>
   );
 }

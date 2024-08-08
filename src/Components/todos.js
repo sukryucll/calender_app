@@ -1,7 +1,8 @@
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Text, IconButton } from "@chakra-ui/react";
+import { CloseIcon } from "@chakra-ui/icons";
 import React from "react";
 
-function Todos({ transactions }) {
+function Todos({ transactions, onRemoveTransaction }) {
   return (
     <Box
       p="6"
@@ -22,7 +23,7 @@ function Todos({ transactions }) {
         <Text color="white">No todos available.</Text>
       ) : (
         transactions.map((transaction, index) => (
-          <Box
+          <Flex
             key={index}
             p="4"
             border="1px solid"
@@ -31,12 +32,25 @@ function Todos({ transactions }) {
             mb="2"
             background="white"
             width="100%"
-            overflow="hidden"
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
+            alignItems="center"
+            justifyContent="space-between"
           >
-            {transaction}
-          </Box>
+            <Text
+              flex="1"
+              overflow="hidden"
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+            >
+              {transaction}
+            </Text>
+            <IconButton
+              icon={<CloseIcon />}
+              size="sm"
+              variant="ghost"
+              color="red.500"
+              onClick={() => onRemoveTransaction(index)}
+            />
+          </Flex>
         ))
       )}
     </Box>
